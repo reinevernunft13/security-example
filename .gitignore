@@ -1,8 +1,10 @@
-# third-party libraries & dependencies
+# third-party lib & dependencies
 node_modules
 
 # sensitive information
 .env
-*.pem
+.cert.pem
+.key.pem
 
-
+# other
+notes.md
