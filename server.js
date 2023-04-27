@@ -26,11 +26,13 @@ const AUTH_OPTIONS = {
 
 function verifyCallback(accessToken, refreshToken, profile, done) {
     console.log('Google profile', profile);
+    console.log('HERE IS THE ACCESSTOKEN FROM GOOGLE: ', accessToken)
     //if the creds passed (accesstoken + refreshtoken) are valid, we call done() to supply passport with the user that authenticated
     //if something goes wrong/the user's creds are invalid we can pass in an error as first option. Here we're assuming there's no error.
     done(null, profile)
 }
-passport.use(new Strategy(AUTH_OPTIONS, verifyCallback))
+
+passport.use(new Strategy(AUTH_OPTIONS, verifyCallback));
 
 //saves user session to the cookie
 passport.serializeUser((user, done) => {
@@ -40,7 +42,7 @@ passport.serializeUser((user, done) => {
 //reads user session from the cookie
 passport.deserializeUser((id, done) => {
     done(null, id);
-})
+});
 
 const app = express();
 //middleware securing our endpoints by protecting against common config issues
@@ -50,7 +52,7 @@ app.use(cookieSession({
     name: 'session',
     maxAge: 24 * 60 * 60 * 1000,
     keys: [config.COOKIE_KEY_1, config.COOKIE_KEY_2]
-}))
+}));
 //Initialize passport
 //function that returns passport middleware that helps us set up passport session
 app.use(passport.initialize());
@@ -70,7 +72,7 @@ function checkLoggedIn(req, res, next) {
 
 app.get('/auth/google', passport.authenticate('google', {
     //which data we're requesting from google when everything succeeds
-    scope: ['email'], //'profile' or any data we'll use to fill out a user's info in a db
+    scope: ['profile', 'email'], //'profile' or any data we'll use to fill out a user's info in a db
 }));
 
 app.get('/auth/google/callback', passport.authenticate('google', {
@@ -98,7 +100,6 @@ app.get('/secret', checkLoggedIn, (req, res) => {
 app.get('/failure', (req, res) => {
     return res.send('Failed to log in');
 })
-
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
